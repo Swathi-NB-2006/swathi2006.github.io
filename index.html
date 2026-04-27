@@ -1,29 +1,716 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Swathi's Website</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Swathi — ECE Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #12121a;
+      --card: #1a1a26;
+      --accent: #c8a96e;
+      --accent2: #7c6ef0;
+      --text: #e8e6f0;
+      --muted: #7a7890;
+      --border: rgba(200,169,110,0.15);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      overflow-x: hidden;
+    }
+
+    /* ─── NOISE OVERLAY ─── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+      opacity: 0.6;
+    }
+
+    /* ─── BACKGROUND ORBS ─── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.18;
+    }
+    .orb1 { width: 500px; height: 500px; background: var(--accent2); top: -100px; left: -100px; animation: drift 14s ease-in-out infinite alternate; }
+    .orb2 { width: 400px; height: 400px; background: var(--accent); bottom: 100px; right: -100px; animation: drift 18s ease-in-out infinite alternate-reverse; }
+    .orb3 { width: 300px; height: 300px; background: #e06090; top: 50%; left: 50%; transform: translate(-50%,-50%); animation: drift 22s ease-in-out infinite alternate; }
+
+    @keyframes drift {
+      from { transform: translate(0,0) scale(1); }
+      to   { transform: translate(40px, 30px) scale(1.1); }
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.2rem 4rem;
+      background: rgba(10,10,15,0.6);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      color: var(--accent);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ─── HERO ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0 4rem;
+      z-index: 1;
+    }
+
+    .hero-inner {
+      max-width: 800px;
+      opacity: 0;
+      transform: translateY(30px);
+      animation: fadeUp 1s 0.3s forwards ease-out;
+    }
+
+    .hero-tag {
+      display: inline-block;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.3rem 0.9rem;
+      border-radius: 2rem;
+      margin-bottom: 1.8rem;
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(3rem, 8vw, 6.5rem);
+      line-height: 1.05;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 1.1rem;
+      color: var(--muted);
+      max-width: 480px;
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .hero-btns { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #0a0a0f;
+      border: none;
+      padding: 0.85rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(200,169,110,0.3); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* ─── PHOTO FLOAT ─── */
+    .hero-photo {
+      position: absolute;
+      right: 6rem;
+      top: 50%;
+      transform: translateY(-50%);
+      opacity: 0;
+      animation: fadeUp 1s 0.6s forwards ease-out;
+    }
+
+    .hero-photo .frame {
+      width: 280px;
+      height: 280px;
+      border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%;
+      background: linear-gradient(135deg, var(--accent2) 0%, var(--accent) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: morph 8s ease-in-out infinite;
+    }
+
+    @keyframes morph {
+      0%,100% { border-radius: 60% 40% 55% 45% / 45% 55% 45% 55%; }
+      50%      { border-radius: 45% 55% 45% 55% / 60% 40% 55% 45%; }
+    }
+
+    .hero-photo .initials {
+      font-family: 'Playfair Display', serif;
+      font-size: 5rem;
+      font-style: italic;
+      color: rgba(255,255,255,0.9);
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--muted);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      z-index: 1;
+    }
+
+    .scroll-hint .line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--accent), transparent);
+      animation: scrollLine 2s ease-in-out infinite;
+    }
+
+    @keyframes scrollLine {
+      0%,100% { transform: scaleY(1); opacity: 1; }
+      50%      { transform: scaleY(0.5); opacity: 0.4; }
+    }
+
+    /* ─── SECTIONS ─── */
+    section {
+      position: relative;
+      z-index: 1;
+      padding: 6rem 4rem;
+    }
+
+    .section-label {
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.1;
+      margin-bottom: 3rem;
+    }
+
+    .section-title span { color: var(--accent); font-style: italic; }
+
+    /* ─── ABOUT ─── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+    }
+
+    .about-text p {
+      color: var(--muted);
+      line-height: 1.9;
+      margin-bottom: 1.2rem;
+    }
+
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .stat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 1.8rem;
+      border-radius: 12px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .stat-card:hover { border-color: var(--accent); transform: translateY(-4px); }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.5rem;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-label { font-size: 0.8rem; color: var(--muted); letter-spacing: 0.05em; }
+
+    /* ─── SKILLS ─── */
+    .skills-wrap { max-width: 900px; }
+
+    .skill-group { margin-bottom: 3rem; }
+
+    .skill-group-title {
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1.2rem;
+    }
+
+    .skill-pills { display: flex; flex-wrap: wrap; gap: 0.75rem; }
+
+    .pill {
+      padding: 0.6rem 1.4rem;
+      border-radius: 2rem;
+      font-size: 0.88rem;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      transition: all 0.3s;
+      cursor: default;
+    }
+
+    .pill:hover {
+      background: var(--accent);
+      color: #0a0a0f;
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    .pill.accent { border-color: var(--accent2); color: #a8a0f8; background: rgba(124,110,240,0.1); }
+    .pill.accent:hover { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
+    /* ─── PROJECTS ─── */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2.2rem;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, transform 0.3s;
+      cursor: default;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .project-card:hover { border-color: rgba(200,169,110,0.4); transform: translateY(-6px); }
+    .project-card:hover::before { opacity: 1; }
+
+    .project-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, var(--accent2), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      margin-bottom: 1.4rem;
+    }
+
+    .project-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      margin-bottom: 0.7rem;
+    }
+
+    .project-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      margin-bottom: 1.4rem;
+    }
+
+    .project-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.7rem;
+      border-radius: 2rem;
+      background: rgba(200,169,110,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(200,169,110,0.2);
+      margin-right: 0.4rem;
+    }
+
+    /* ─── GOALS ─── */
+    .goals-list { display: flex; flex-direction: column; gap: 1.2rem; max-width: 700px; }
+
+    .goal-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1.4rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      padding: 1.6rem 2rem;
+      border-radius: 12px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .goal-item:hover { border-color: var(--accent); transform: translateX(6px); }
+
+    .goal-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      color: var(--accent);
+      opacity: 0.4;
+      line-height: 1;
+      min-width: 2.5rem;
+    }
+
+    .goal-text h4 { font-size: 1rem; font-weight: 500; margin-bottom: 0.3rem; }
+    .goal-text p  { font-size: 0.88rem; color: var(--muted); line-height: 1.6; }
+
+    /* ─── CONTACT / FOOTER ─── */
+    .contact-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 5rem 4rem;
+    }
+
+    .contact-section .section-title { margin-bottom: 1rem; }
+
+    .contact-section p { color: var(--muted); margin-bottom: 2.5rem; }
+
+    .socials {
+      display: flex;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .social-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.6rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: all 0.3s;
+    }
+
+    .social-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+    footer {
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: 0.8rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      width: 80px;
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), transparent);
+      margin: 0 auto 4rem;
+    }
+
+    /* ─── ANIMATIONS ─── */
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      nav { padding: 1rem 2rem; }
+      .nav-links { display: none; }
+      .hero { padding: 0 2rem; }
+      .hero-photo { display: none; }
+      section { padding: 4rem 2rem; }
+      .about-grid { grid-template-columns: 1fr; }
+      .contact-section { padding: 4rem 2rem; }
+    }
+  </style>
 </head>
-<body style="text-align:center; font-family:Arial; background-color:#f0f8ff;">
+<body>
 
-  <h1 style="color:blue;">Hi, I'm Swathi 👋</h1>
-  <img src="https://via.placeholder.com/150"
-    alt="my photo"style="border-radius:50%;">
-  <p>ECE Student | Learning Coding</p>
+  <!-- Background orbs -->
+  <div class="orb orb1"></div>
+  <div class="orb orb2"></div>
+  <div class="orb orb3"></div>
 
-  <h2>About Me</h2>
-  <p>I am a 2nd year ECE student learning Python, C++ and building projects.</p>
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-logo">Swathi</div>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#goals">Goals</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
 
-  <h2>My Skills</h2>
-  <ul style="list-style:none;">
-    <li>Python</li>
-    <li>C++</li>
-    <li>C</li>
-  </ul>
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="hero-inner">
+      <span class="hero-tag">ECE Student &amp; Developer</span>
+      <h1>Hi, I'm<br/><em>Swathi</em> 👋</h1>
+      <p class="hero-desc">
+        2nd year Electronics &amp; Communication Engineering student, building skills in Python, C++ and turning curiosity into real-world projects.
+      </p>
+      <div class="hero-btns">
+        <a href="#projects" class="btn-primary">View Projects</a>
+        <a href="#contact" class="btn-ghost">Get in Touch</a>
+      </div>
+    </div>
+    <div class="hero-photo">
+      <div class="frame">
+        <span class="initials">S</span>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <div class="line"></div>
+    </div>
+  </section>
 
-  <h2>My Goal</h2>
-  <p>I want to build projects and participate in hackathons.</p>
+  <!-- About -->
+  <section id="about">
+    <div class="reveal">
+      <p class="section-label">Who I am</p>
+      <h2 class="section-title">A Curious Mind in <span>Electronics</span></h2>
+    </div>
+    <div class="about-grid reveal">
+      <div class="about-text">
+        <p>I'm a 2nd year ECE student with a deep passion for understanding how hardware and software intersect. From circuits to code, I love exploring the full stack of what makes technology tick.</p>
+        <p>I'm currently sharpening my skills in Python and C++, applying them to hands-on projects that challenge me to think differently and build smarter.</p>
+        <p>My dream is to participate in hackathons, collaborate with like-minded innovators, and ship projects that create real impact.</p>
+      </div>
+      <div class="about-stats">
+        <div class="stat-card">
+          <div class="stat-num">2nd</div>
+          <div class="stat-label">Year of ECE</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">3+</div>
+          <div class="stat-label">Languages Learning</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Curiosity Level</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">0→1</div>
+          <div class="stat-label">Builder Mindset</div>
+        </div>
+      </div>
+    </div>
+  </section>
 
+  <!-- Skills -->
+  <section id="skills" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="reveal">
+      <p class="section-label">What I know</p>
+      <h2 class="section-title">My <span>Skills</span></h2>
+    </div>
+    <div class="skills-wrap reveal">
+      <div class="skill-group">
+        <p class="skill-group-title">Programming Languages</p>
+        <div class="skill-pills">
+          <span class="pill">Python</span>
+          <span class="pill">C++</span>
+          <span class="pill">C</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <p class="skill-group-title">ECE Core</p>
+        <div class="skill-pills">
+          <span class="pill accent">Digital Electronics</span>
+          <span class="pill accent">Circuit Analysis</span>
+          <span class="pill accent">Signals &amp; Systems</span>
+          <span class="pill accent">Microcontrollers</span>
+        </div>
+      </div>
+      <div class="skill-group">
+        <p class="skill-group-title">Tools &amp; Mindset</p>
+        <div class="skill-pills">
+          <span class="pill">Problem Solving</span>
+          <span class="pill">Teamwork</span>
+          <span class="pill">Fast Learner</span>
+          <span class="pill">Hackathon Ready</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section id="projects">
+    <div class="reveal">
+      <p class="section-label">What I build</p>
+      <h2 class="section-title">My <span>Projects</span></h2>
+    </div>
+    <div class="projects-grid reveal">
+      <div class="project-card">
+        <div class="project-icon">🚀</div>
+        <h3>Coming Soon</h3>
+        <p>I'm actively working on exciting projects. Stay tuned — something great is being built here.</p>
+        <span class="project-tag">Python</span>
+        <span class="project-tag">In Progress</span>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">⚡</div>
+        <h3>Hackathon Projects</h3>
+        <p>Planning to participate in upcoming hackathons and build innovative solutions under pressure.</p>
+        <span class="project-tag">C++</span>
+        <span class="project-tag">Upcoming</span>
+      </div>
+      <div class="project-card">
+        <div class="project-icon">🔧</div>
+        <h3>ECE Lab Work</h3>
+        <p>Applying classroom theory to real circuits and embedded systems experiments in the lab.</p>
+        <span class="project-tag">Hardware</span>
+        <span class="project-tag">ECE</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Goals -->
+  <section id="goals" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="reveal">
+      <p class="section-label">Where I'm headed</p>
+      <h2 class="section-title">My <span>Goals</span></h2>
+    </div>
+    <div class="goals-list reveal">
+      <div class="goal-item">
+        <span class="goal-num">01</span>
+        <div class="goal-text">
+          <h4>Build Real Projects</h4>
+          <p>Go beyond tutorials and build complete, functional projects that solve actual problems — from design to deployment.</p>
+        </div>
+      </div>
+      <div class="goal-item">
+        <span class="goal-num">02</span>
+        <div class="goal-text">
+          <h4>Compete in Hackathons</h4>
+          <p>Join national and college-level hackathons to challenge myself, collaborate with peers, and ship ideas fast.</p>
+        </div>
+      </div>
+      <div class="goal-item">
+        <span class="goal-num">03</span>
+        <div class="goal-text">
+          <h4>Master ECE + Software</h4>
+          <p>Bridge the gap between electronics and software — becoming proficient in embedded systems, IoT, and beyond.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <div class="contact-section" id="contact">
+    <div class="reveal">
+      <p class="section-label">Say hello</p>
+      <h2 class="section-title" style="margin-bottom:1rem;">Let's <span>Connect</span></h2>
+      <p>Open to collaborations, project ideas, and hackathon teams!</p>
+      <div class="socials">
+        <a href="mailto:swathi@example.com" class="social-btn">✉️ &nbsp; Email Me</a>
+        <a href="#" class="social-btn">💼 &nbsp; LinkedIn</a>
+        <a href="#" class="social-btn">🐙 &nbsp; GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>Crafted with passion by <strong style="color:var(--accent)">Swathi</strong> · ECE Student · 2025</p>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 120);
+        }
+      });
+    }, { threshold: 0.1 });
+    reveals.forEach(el => observer.observe(el));
+  </script>
 </body>
 </html>
-<h2>my projects</h2>
-<p>coming soon...</p>
